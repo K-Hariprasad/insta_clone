@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
-import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
-import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-import {auth} from  './FirebaseConfig'
+import {auth} from  './FirebaseConfig';
+import {Link} from 'react-router-dom';
+import { useHistory } from "react-router-dom";
+import Spinner from './Spinner';
+
 const useStyles = makeStyles((theme) => ({
     paper: {
       marginTop: theme.spacing(8),
@@ -30,19 +32,27 @@ const useStyles = makeStyles((theme) => ({
     },
   }));
 
-function Login({user}) {
+function Login({isUser}) {
+  let history = useHistory();
   const classes = useStyles();
   const [email, setEmail] = useState()
   const [password, setPassword] = useState()
+  const [loading, setLoading] = useState(false);
+
   const handleSignin = (e) => {
     e.preventDefault();
-    auth.signInWithEmailAndPassword(email,password).then()
+    setLoading(true)
+    auth.signInWithEmailAndPassword(email,password).then(authUser => {
+      isUser(authUser.displayName)
+      setLoading(false)
+      history.push("/");
+    }).catch(error=>{
+      alert(error.message)
+      setLoading(false)})
   }
     return (
       <div className="login_main">
         <Container component="main" maxWidth="xs">
-            {user}
-          <CssBaseline />
           <div className={classes.paper}>
             <Avatar className={classes.avatar}>
               <LockOutlinedIcon />
@@ -74,7 +84,7 @@ function Login({user}) {
                 onChange = {(e)=>setPassword(e.target.value)}
               />
 
-              <Button
+              {loading?<Spinner/>:<Button
                 type="submit"
                 fullWidth
                 variant="contained"
@@ -82,10 +92,10 @@ function Login({user}) {
                 className={classes.submit}
               >
                 Sign In
-              </Button>
+              </Button>}
               <Grid container>
                 <Grid item>
-                  <Link href="#" variant="body2">
+                  <Link to="/signup" variant="body2">
                     {"Don't have an account? Sign Up"}
                   </Link>
                 </Grid>

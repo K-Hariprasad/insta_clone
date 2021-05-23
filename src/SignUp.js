@@ -64,7 +64,7 @@ function SignUp({ isUser }) {
   };
   return (
     <div>
-    {loading?<Spinner/>:null}
+    
       <Container component="main" maxWidth="xs">
         <CssBaseline />
         <div className={classes.paper}>
@@ -107,6 +107,7 @@ function SignUp({ isUser }) {
               id="password"
               onChange={(e) => setPassword(e.target.value)}
             />
+            {loading?<Spinner/>:
             <Button
               type="submit"
               fullWidth
@@ -115,7 +116,7 @@ function SignUp({ isUser }) {
               className={classes.submit}
             >
               Sign Up
-            </Button>
+            </Button>}
             <Grid container>
               <Grid item>
                 <Link to="/login" variant="body2">

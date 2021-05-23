@@ -1,4 +1,4 @@
-import react, {useEffect, useState} from 'react'
+import {useEffect, useState} from 'react'
 import Home from "./Home";
 import Login from "./Login";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
@@ -22,7 +22,7 @@ function App() {
             <Home user={user}/>
           </Route>
           <Route exact path="/login" >
-            <Login/>
+            <Login isUser={isUser}/>
           </Route>
           <Route exact path="/signup" >
             <SignUp isUser={isUser}/>
