@@ -4,10 +4,13 @@ import Header from "./Header";
 import Posts from "./Posts";
 import { db } from "./FirebaseConfig";
 import './Home.css'
+import Spinner from "./Spinner";
 
 function Home({user}) {
+  const [loading,setLoading] = useState(false)
   const [posts, setPosts] = useState([]);
   useEffect(() => {
+    setLoading(true)
     db.collection("posts").orderBy('timeStamp','desc').onSnapshot((snapShot) => {
       setPosts(
         snapShot.docs.map((doc) => ({
@@ -15,11 +18,16 @@ function Home({user}) {
           post: doc.data(),
         }))
       );
+      setLoading(false)
     });
   }, []);
   return (
     <div>
       <Header user={user}/>
+      {loading?
+      <div style={{minHeight:'80vh',display:'flex',justifyContent:'center'}}>
+        <Spinner/>
+      </div>:
       <div className="home_main">
         {posts.length > 0 &&
           posts.map(({ post, id }) => (
@@ -31,7 +39,7 @@ function Home({user}) {
               />
             </div>
           ))}
-        </div>
+        </div>}
     </div>
   );
 }

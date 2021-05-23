@@ -28,8 +28,8 @@ function Header({ user }) {
   };
   return (
     <div className="header">
-      <div>
-        <img
+      <div className="header_logo">
+        <img 
           src={logo}
           alt="logo"
         />

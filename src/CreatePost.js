@@ -10,49 +10,54 @@ import PhotoCamera from '@material-ui/icons/PhotoCamera';
 import IconButton from '@material-ui/core/IconButton';
 import {db, storage} from './FirebaseConfig'
 import firebase from 'firebase'
-import LinearProgress from '@material-ui/core/LinearProgress';
+import Spinner from './Spinner'
 
 function CreatePost({showModal,user}) {
     const [previewImg,setPreviewImg] = useState()
-    const [progress, setProgress]=useState()
+    const [progress, setProgress]=useState(0)
     const [caption, setCaption] = useState()
     const [image, setImage] = useState()
-
+    const [error,setError] = useState()
+    const [loading,setLoading] = useState(false)
     const handlePost = () =>{
-        const uploadTask = storage.ref(`post_images/${image.name}`).put(image)
-        uploadTask.on('state_changed', 
-            (snapshot)=>{
-                const progress = Math.round(
-                    (snapshot.bytesTransferred/snapshot.totalBytes)*100
-                )
-                setProgress(progress)
-            }, 
-            (error) => {
-                alert(error.message)
-            },
-            () => {
-                storage.ref('post_images').child(image.name).getDownloadURL().then(
-                    url => {
-                        db.collection("posts").add({
-                            caption : caption,
-                            imageUrl :url,
-                            username : user.displayName,
-                            timeStamp : firebase.firestore.FieldValue.serverTimestamp()
-                        })
-                        setProgress(0);
-                        setCaption();
-                        setImage();
-                        setPreviewImg();
-                        closeModal()
-                    }
-                )
-            })
+        if(caption && image){
+            setLoading(true)
+            const uploadTask = storage.ref(`post_images/${image.name}`).put(image)
+            uploadTask.on('state_changed', 
+                (snapshot)=>{
+                    const progress = Math.round(
+                        (snapshot.bytesTransferred/snapshot.totalBytes)*100
+                    )
+                    setProgress(progress)
+                }, 
+                (error) => {
+                    alert(error.message)
+                },
+                () => {
+                    storage.ref('post_images').child(image.name).getDownloadURL().then(
+                        url => {
+                            db.collection("posts").add({
+                                caption : caption,
+                                imageUrl :url,
+                                username : user.displayName,
+                                timeStamp : firebase.firestore.FieldValue.serverTimestamp()
+                            })
+                            closeModal()
+                        }
+                    )
+                })
+        }
+        else{
+            setLoading(false)
+            setError("Photo and caption required")
+        }
     }
     const closeModal =() => {
            showModal(false)
 
     }
     const handleChange=(event)=> {
+        setError()
        setImage(event.target.files[0])
        setPreviewImg(URL.createObjectURL(event.target.files[0]))
        
@@ -62,9 +67,13 @@ function CreatePost({showModal,user}) {
     const onBtnClick = () => {
         inputFileRef.current.click();
     }
-
+    const handleCaption=(e)=>{
+        setError()
+        setCaption(e.target.value)
+    }
   return (
     <div>
+      {error?alert(error):""}
       <Dialog
         open={true}
         onClose={()=>showModal(false)}
@@ -104,12 +113,12 @@ function CreatePost({showModal,user}) {
             type="text"
             fullWidth
             multiline
-            onChange={(e)=>setCaption(e.target.value)}
+            onChange={handleCaption}
           />
         </DialogContent>
         <DialogActions>
-            {progress?
-            <LinearProgress variant="determinate" value={progress} />:
+            {loading?
+            <Spinner/>:
             <div>
                 <Button onClick={()=>showModal(false)} color="primary">
                     Cancel
