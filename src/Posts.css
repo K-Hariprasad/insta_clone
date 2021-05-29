@@ -9,6 +9,9 @@
     align-items: center;
     padding: 10px;
 }
+.post_header button{
+    margin-left: auto;
+}
 .post_header h3{
     margin-left: 5px;
 }
@@ -19,4 +22,32 @@
 .post_caption{
     font-weight: normal;
     padding: 10px;
+}
+.post_comments{
+    padding: 20px;
+}
+.post_commentBox{
+    display: flex;
+    margin-top: 10px;
+}
+.post_commentBox input{
+    flex:1;
+    border: none;
+    padding: 10px;
+    border-top: 1px solid lightgray
+}
+.post_commentBox button{
+    flex:0;
+    border: none;
+    color: #E83200;
+    border-top: 1px solid lightgray;
+    background-color: transparent;
+}
+.post_comment{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.post_comment p{
+    flex: 1;
 }

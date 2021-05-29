@@ -33,6 +33,8 @@ function Home({user}) {
           posts.map(({ post, id }) => (
             <div className="home_posts_container" key={id}>
               <Posts
+                postId = {id}
+                signedUser = {user}
                 username={post.username}
                 caption={post.caption}
                 imageUrl={post.imageUrl}
