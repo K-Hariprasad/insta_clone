@@ -10,9 +10,16 @@ import SendIcon from '@material-ui/icons/Send';
 import MoreVertIcon from '@material-ui/icons/MoreVert'
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
+import FavouriteIcon from '@material-ui/icons/Favorite'
+import FavouriteBorderIcon from '@material-ui/icons/FavoriteBorderOutlined'
 
 function Posts({signedUser, username, imageUrl, caption, postId }) {
   let history = useHistory()
+  const [likeData,setLikeData]=useState({
+    noOflikes : 0,
+    id : '',
+    username:''
+  })
   const [comment, setComment] = useState()
   const [comments, setComments] = useState([])
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -35,6 +42,23 @@ function Posts({signedUser, username, imageUrl, caption, postId }) {
     }
     return () => unsubscribe();
   },[postId])
+  useEffect(()=>{
+    let unsubscribe;
+    if(postId){
+      unsubscribe = db.collection('posts').doc(postId).collection('likes').onSnapshot((snapsot)=>{
+        let likesArray =snapsot.docs.map((doc)=>({
+          id:doc.id,
+          username:doc.data().username
+        }))
+        let isLikedByUser = likesArray.length>0 && likesArray.find(item=>{
+          return item.username === signedUser.displayName
+        })
+        isLikedByUser?setLikeData({...likeData,...isLikedByUser,noOflikes:likesArray?.length}):setLikeData({...likeData,noOflikes:likesArray?.length})
+      })
+    }
+    return () => unsubscribe();
+  },[postId])
+
   const postComment = (e) => {
     if(signedUser){
       e.preventDefault();
@@ -50,9 +74,17 @@ function Posts({signedUser, username, imageUrl, caption, postId }) {
       history.push('/login')
     }
   }
-  const deletePost = (Postid) => {
+  const handleLike = () => {
+    db.collection('posts').doc(postId).collection('likes').add({
+      username : signedUser.displayName,
+    })
+  }
+  const handleUnlike = () => {
+    db.collection('posts').doc(postId).collection('likes').doc(likeData.id).delete();
+  }
+  const deletePost = (postId) => {
     var r = window.confirm("Are you sure? Do you want to delete this post?");
-    if (r == true) {
+    if (r === true) {
       db.collection('posts').doc(postId).delete();
     }
     else{
@@ -61,7 +93,7 @@ function Posts({signedUser, username, imageUrl, caption, postId }) {
   }
   const deleteComment = (id) => {
     var r = window.confirm("Are you sure? Do you want to delete this comment?");
-    if (r == true) {
+    if (r === true) {
       db.collection('posts').doc(postId).collection('comments').doc(id).delete();
     } 
   }
@@ -78,10 +110,21 @@ function Posts({signedUser, username, imageUrl, caption, postId }) {
       <div>
         <img className="post_image" src={imageUrl} alt="post-img" />
       </div>
+      <div className="post_actions">
+        {likeData.id?
+        <IconButton onClick={handleUnlike}>
+          <FavouriteIcon/> {likeData.noOflikes===0?"":likeData.noOflikes}
+        </IconButton>
+        :
+        <IconButton onClick={handleLike}>
+          <FavouriteBorderIcon /> {likeData.noOflikes===0?"":likeData.noOflikes}
+        </IconButton>}
+      </div>
       <h4 className="post_caption">
         <strong className="text-capitalize">{username}</strong>
         {"  "}
         {caption}
+        {postId}
       </h4>
       <div className = "post_comments">
           {comments.map(({id, comment}) => (
