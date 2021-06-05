@@ -30,6 +30,7 @@ function Header({ user }) {
   };
   const handleProfileClick = () => {
     history.push("/profile");
+    handleClose()
   }
   return (
     <div className="header">

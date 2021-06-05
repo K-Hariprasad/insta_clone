@@ -4,7 +4,10 @@
 }
 
 .bottomNav_container .MuiBottomNavigationAction-root.Mui-selected {
-    color: #E83200;
+    color: rgba(0, 0, 0, 0.54);
+}
+.bottomNav_container .MuiBottomNavigationAction-root:hover {
+    color: #e83200 !important;;
 }
 @media only screen and (min-width:501px){
 
