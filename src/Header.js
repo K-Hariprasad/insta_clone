@@ -7,7 +7,8 @@ import { auth } from "./FirebaseConfig";
 import Button from "@material-ui/core/Button";
 import { useHistory } from "react-router-dom";
 import CreatePost from "./CreatePost";
-import logo from './Assets/Ulgram.png'
+import logo from './Assets/Ulgram.png';
+
 function Header({ user }) {
   let history = useHistory();
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -20,18 +21,23 @@ function Header({ user }) {
     setAnchorEl(null);
   };
   const handleLogout = () => {
+    history.push("/");
     auth.signOut();
     handleClose();
   };
   const handleLogin = () => {
     history.push("/login");
   };
+  const handleProfileClick = () => {
+    history.push("/profile");
+  }
   return (
     <div className="header">
       <div className="header_logo">
         <img 
           src={logo}
           alt="logo"
+          onClick={()=>history.push('/')}
         />
       </div>
       {user ? (
@@ -43,7 +49,7 @@ function Header({ user }) {
             aria-haspopup="true"
             onClick={handleClick}
             alt={user && user.displayName}
-            src="/static/images/avatar/1.jpg"
+            src={user.photoURL}
           />
         </div>
       ) : (
@@ -60,7 +66,7 @@ function Header({ user }) {
       >
         <MenuItem
           style={{ padding: "10px 30px", fontSize: "20px" }}
-          onClick={handleClose}
+          onClick={handleProfileClick}
         >
           Profile
         </MenuItem>

@@ -1,0 +1,14 @@
+.bottomNav_container{
+    position: sticky;
+    bottom: 0;
+}
+
+.bottomNav_container .MuiBottomNavigationAction-root.Mui-selected {
+    color: #E83200;
+}
+@media only screen and (min-width:501px){
+
+    .bottomNav_container{
+       display: none;
+    }
+}

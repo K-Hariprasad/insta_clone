@@ -85,7 +85,7 @@ function CreatePost({showModal,user}) {
             <div style={{display:'flex',alignItems:'center',marginBottom:'10px',gap:'10px'}}>
                 <Avatar
                     alt={user && user.displayName}
-                    src="/static/images/avatar/1.jpg"
+                    src={user && user.photoURL}
                 />
                 <h3>{user && user.displayName}</h3>
             </div>

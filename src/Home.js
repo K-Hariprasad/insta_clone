@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
 import "./App.css";
-import Header from "./Header";
 import Posts from "./Posts";
-import { db } from "./FirebaseConfig";
 import './Home.css'
 import Spinner from "./Spinner";
+import { db, storage, auth } from "./FirebaseConfig";
+import firebase from 'firebase';
 
 function Home({user}) {
   const [loading,setLoading] = useState(false)
   const [posts, setPosts] = useState([]);
+  const [avatar,setAvatar]=useState([])
+
   useEffect(() => {
     setLoading(true)
     db.collection("posts").orderBy('timeStamp','desc').onSnapshot((snapShot) => {
@@ -21,9 +23,22 @@ function Home({user}) {
       setLoading(false)
     });
   }, []);
+  useEffect(async()=>{
+    const storageRef = firebase.storage().ref("profile_images");
+    let avatars=[];
+     storageRef.listAll().then(async function(result) {
+      await result.items.map((imageRef,index)=>{
+        imageRef.getDownloadURL().then((url)=> {
+         avatars=[...avatars,url];
+         if (index===result.items.length-1){
+           setAvatar(avatars)
+         }
+        })
+      })
+  })
+  },[])
   return (
     <div>
-      <Header user={user}/>
       {loading?
       <div style={{minHeight:'80vh',display:'flex',justifyContent:'center'}}>
         <Spinner/>
@@ -36,6 +51,7 @@ function Home({user}) {
                 postId = {id}
                 signedUser = {user}
                 username={post.username}
+                avatarUrl={post.username && avatar && avatar.filter(e=>e.includes(post.username))[0]}
                 caption={post.caption}
                 imageUrl={post.imageUrl}
               />

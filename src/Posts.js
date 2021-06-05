@@ -13,7 +13,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import FavouriteIcon from '@material-ui/icons/Favorite'
 import FavouriteBorderIcon from '@material-ui/icons/FavoriteBorderOutlined'
 
-function Posts({signedUser, username, imageUrl, caption, postId }) {
+function Posts({signedUser, username, imageUrl, caption, postId, avatarUrl }) {
   let history = useHistory()
   const [likeData,setLikeData]=useState({
     noOflikes : 0,
@@ -50,7 +50,7 @@ function Posts({signedUser, username, imageUrl, caption, postId }) {
           id:doc.id,
           username:doc.data().username
         }))
-        let isLikedByUser = likesArray.length>0 && likesArray.find(item=>{
+        let isLikedByUser = signedUser && likesArray.length>0 && likesArray.find(item=>{
           return item.username === signedUser.displayName
         })
         isLikedByUser?setLikeData({...likeData,...isLikedByUser,noOflikes:likesArray?.length}):setLikeData({...likeData,noOflikes:likesArray?.length})
@@ -58,7 +58,7 @@ function Posts({signedUser, username, imageUrl, caption, postId }) {
     }
     return () => unsubscribe();
   },[postId])
-
+  
   const postComment = (e) => {
     if(signedUser){
       e.preventDefault();
@@ -82,7 +82,7 @@ function Posts({signedUser, username, imageUrl, caption, postId }) {
   const handleUnlike = () => {
     db.collection('posts').doc(postId).collection('likes').doc(likeData.id).delete();
   }
-  const deletePost = (postId) => {
+  const deletePost = () => {
     var r = window.confirm("Are you sure? Do you want to delete this post?");
     if (r === true) {
       db.collection('posts').doc(postId).delete();
@@ -100,31 +100,34 @@ function Posts({signedUser, username, imageUrl, caption, postId }) {
   return (
     <div className="post_main">
       <div className="post_header">
-        <Avatar alt={username} src="/static/images/avatar/1.jpg" />
+        <Avatar alt={username} src={avatarUrl} />
         <h3 className="text-capitalize">{username}</h3>
         {username === signedUser?.displayName &&
         <IconButton aria-label="delete" onClick={handleClick}>
           <MoreVertIcon/>
         </IconButton>}
       </div>
-      <div>
-        <img className="post_image" src={imageUrl} alt="post-img" />
+      <div className="post_image">
+        <img src={imageUrl} alt="post-img" />
       </div>
       <div className="post_actions">
         {likeData.id?
-        <IconButton onClick={handleUnlike}>
-          <FavouriteIcon/> {likeData.noOflikes===0?"":likeData.noOflikes}
-        </IconButton>
-        :
+        <div className="post_likeSection">
+          <IconButton onClick={handleUnlike}>
+            <FavouriteIcon/> 
+          </IconButton>
+          {" "} <p>{likeData.noOflikes===0?"":likeData.noOflikes}</p>
+        </div>
+        :<div className="post_likeSection">
         <IconButton onClick={handleLike}>
-          <FavouriteBorderIcon /> {likeData.noOflikes===0?"":likeData.noOflikes}
-        </IconButton>}
+          <FavouriteBorderIcon />  
+        </IconButton> {" "} <p>{likeData.noOflikes===0?"":likeData.noOflikes}</p>
+        </div>}
       </div>
       <h4 className="post_caption">
         <strong className="text-capitalize">{username}</strong>
         {"  "}
         {caption}
-        {postId}
       </h4>
       <div className = "post_comments">
           {comments.map(({id, comment}) => (
