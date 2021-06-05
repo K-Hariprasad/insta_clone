@@ -35,7 +35,7 @@ function App() {
             <Profile user={user}/>
           </Route>
         </Switch>
-        {window.location.pathname ==="/login"||window.location.pathname ==="/signup"?null: <BottomNav user={user}/>}
+        {user?(window.location.pathname ==="/login"||window.location.pathname ==="/signup")?null: <BottomNav user={user}/>:null}
       </BrowserRouter>
     </div>
   );
